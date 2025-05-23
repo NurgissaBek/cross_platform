@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "684132204105",
+    "firebase_url": "https://musa-63bdf-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "musa-63bdf",
+    "storage_bucket": "musa-63bdf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684132204105:android:fd5da513152d84fe17c998",
+        "android_client_info": {
+          "package_name": "com.codsoft.to_do_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK1ojkgVx10tVvpdXC3mRZyRxNh_hPzR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
