@@ -8,6 +8,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:684132204105:android:f35d576057f8298a17c998",
+        "android_client_info": {
+          "package_name": "com.codsoft.musa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK1ojkgVx10tVvpdXC3mRZyRxNh_hPzR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:684132204105:android:fd5da513152d84fe17c998",
         "android_client_info": {
           "package_name": "com.codsoft.to_do_app"
