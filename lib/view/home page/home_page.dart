@@ -9,51 +9,49 @@ import 'package:to_do_app/view/common%20widgets/back_button.dart';
 import 'package:to_do_app/view/home%20page/components/progress_task.dart';
 import 'package:to_do_app/view/home%20page/components/search_field.dart';
 import 'package:to_do_app/view/new%20task/new_task.dart';
+
 class HomePage extends StatelessWidget {
   HomePage({super.key});
   final controller = Get.put(HomeController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: black,
-        floatingActionButton: GestureDetector(
-          onTap: () => showNewTaskModal(context),
-          child: Container(
-            height: 65,
-            width: 65,
-            margin: const EdgeInsets.only(right: 20, bottom: 20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(70),
-                gradient: const LinearGradient(colors: [
-                  Colors.pinkAccent,
-                  Colors.purpleAccent,
-                ])),
-            child: const Center(
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-            ),
+      backgroundColor: black,
+      floatingActionButton: GestureDetector(
+        onTap: () => showNewTaskModal(context),
+        child: Container(
+          height: 65,
+          width: 65,
+          margin: const EdgeInsets.only(right: 20, bottom: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(70),
+            gradient: const LinearGradient(colors: [
+              Colors.pinkAccent,
+              Colors.purpleAccent,
+            ]),
+          ),
+          child: const Center(
+            child: Icon(Icons.add, color: Colors.white),
           ),
         ),
-        body: SafeArea(
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 120), // запас под FAB
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
+
+              /// Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SvgPicture.asset(
-                      AppIcon.menu,
-                      color: Colors.white,
-                      height: 30,
-                      width: 30,
-                    ),
+                    SvgPicture.asset(AppIcon.menu,
+                        color: Colors.white, height: 30, width: 30),
                     Column(
                       children: [
                         Obx(
@@ -75,127 +73,226 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                     InkWell(
-                      onTap: (){
-                        Get.toNamed('/profile');
-                      },
+                      onTap: () => Get.toNamed('/profile'),
                       child: const CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.white,
                         child: Icon(Icons.person, color: Colors.black),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
+
+              /// Search
               SearchField(),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
+
+              /// Progress Title
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Obx(() => controller.hasData.value? RichText(
+                child: Obx(() => controller.hasData.value
+                    ? RichText(
                         text: TextSpan(children: [
-                      const TextSpan(
-                        text: 'Progress  ',
+                          const TextSpan(
+                            text: 'Progress  ',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16),
+                          ),
+                          TextSpan(
+                            text: '(${controller.taskCount}) ',
+                            style: const TextStyle(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 16),
+                          ),
+                        ]),
+                      )
+                    : const SizedBox()),
+              ),
+              const SizedBox(height: 15),
+
+              /// Filters
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() => DropdownButton<String>(
+                          value: controller.selectedFilter.value,
+                          dropdownColor: primaryColor,
+                          items: ['all', 'completed', 'unComplete']
+                              .map((val) => DropdownMenuItem(
+                                    value: val,
+                                    child: Text(val,
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            controller.selectedFilter.value = val!;
+                            controller.checkData();
+                            controller.update();
+                          },
+                        )),
+                    Obx(() => DropdownButton<String>(
+                          value: controller.selectedCategory.value,
+                          dropdownColor: primaryColor,
+                          items: [
+                            'all',
+                            ...controller.list
+                                .map((e) => e.category)
+                                .toSet()
+                          ]
+                              .map((val) => DropdownMenuItem(
+                                    value: val,
+                                    child: Text(val ?? '',
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            controller.selectedCategory.value = val!;
+                            controller.checkData();
+                            controller.update();
+                          },
+                        )),
+                    Obx(() => DropdownButton<String>(
+                          value: controller.selectedPriority.value,
+                          dropdownColor: primaryColor,
+                          items: ['all', 'Low', 'High']
+                              .map((val) => DropdownMenuItem(
+                                    value: val,
+                                    child: Text(val,
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            controller.selectedPriority.value = val!;
+                            controller.checkData();
+                            controller.update();
+                          },
+                        )),
+                    Obx(() => DropdownButton<String>(
+                          value: controller.selectedSort.value,
+                          dropdownColor: primaryColor,
+                          items: [
+                            'none',
+                            'title_asc',
+                            'title_desc',
+                            'date_asc',
+                            'date_desc',
+                            'priority_high',
+                            'priority_low',
+                          ]
+                              .map((val) => DropdownMenuItem(
+                                    value: val,
+                                    child: Text(
+                                        val.replaceAll('_', ' '),
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            controller.selectedSort.value = val!;
+                            controller.checkData();
+                            controller.update();
+                          },
+                        )),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              ProgressTask(),
+              const SizedBox(height: 30),
+
+              /// Tasks Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Obx(() => controller.hasData.value
+                    ? const Text(
+                        'Tasks',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             fontSize: 16),
-                      ),
-                      TextSpan(
-                        text: '(${controller.taskCount}) ',
-                        style: const TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 16),
-                      ),
-                    ])): const SizedBox()),
+                      )
+                    : const SizedBox()),
               ),
-              const SizedBox(
-                height: 15,
-              ),
-               ProgressTask(),
-              const SizedBox(
-                height: 30,
-              ),
-               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Obx(() =>controller.hasData.value? const Text(
-                  'Tasks',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16),
-                ) : const SizedBox(),)
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Expanded(child: Obx(()=> ListView.builder(
-                itemCount: controller.list.length,
-                itemBuilder: (context, index){
-                  if(controller.list[index].show=='yes'){
-                     return Column(
-                      children: [
-                        Container(
-                          height: 70,
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          margin: const EdgeInsets.symmetric(horizontal: 30),
-                          decoration: BoxDecoration(
-                            color: primaryColor,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                height: 20,
-                                width: 20,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.pinkAccent,
-                                    border: Border.all(color: Colors.white)),
-                                child: const Icon(
-                                  Icons.done,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
+              const SizedBox(height: 20),
+
+              /// Task List
+              Obx(() => ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: controller.filteredTasks.length,
+                    itemBuilder: (context, index) {
+                      final task = controller.filteredTasks[index];
+                      if (task.show == 'yes') {
+                        return Column(
+                          children: [
+                            Container(
+                              height: 70,
+                              width: double.infinity,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 30),
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(30),
                               ),
-                              const SizedBox(
-                                width: 20,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 20,
+                                    width: 20,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.pinkAccent,
+                                        border: Border.all(
+                                            color: Colors.white)),
+                                    child: const Icon(
+                                      Icons.done,
+                                      color: Colors.white,
+                                      size: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    'Create ${task.title} for\n${task.category}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  const Spacer(),
+                                  const CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: Colors.purpleAccent,
+                                  )
+                                ],
                               ),
-                               Text(
-                                'Create ${controller.list[index].title} for\n${controller.list[index].category}',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              const Spacer(),
-                              const CircleAvatar(
-                                radius: 5,
-                                backgroundColor: Colors.purpleAccent,
-                              )
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                      ],
-                    );
-                  }else{
-                    return const SizedBox();
-                  }
-                },
-              )))
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  )),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

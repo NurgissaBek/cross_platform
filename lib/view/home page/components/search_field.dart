@@ -27,13 +27,15 @@ class SearchField extends StatelessWidget {
             : null,
       ),
       child: TextFormField(
-        controller: controller.searchController.value,
+        controller: controller.searchController,
         onTap:controller.onTapField,
         onTapOutside: (event) {
           controller.onTapOutside(context);
         },
         onChanged: (value) {
           controller.checkText();
+          controller.checkData();
+          controller.update();
         },
         style:
         const TextStyle(color: Colors.white, fontWeight: FontWeight.w400),

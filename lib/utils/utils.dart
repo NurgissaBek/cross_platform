@@ -45,14 +45,12 @@ class Utils{
       3 : 'assets/images/back1.jpg',
     };
   }
-  static String getDaysDiffirece(String dateString){
-    DateFormat dateFormat = DateFormat('dd MMM yyyy');
-    DateTime date = dateFormat.parse(dateString);
-    DateTime now = DateTime.now();
-    Duration difference = now.difference(date);
-    return (-1 * difference.inDays).toString();
+  static String getDaysDiffirece(DateTime date){
+  final now = DateTime.now();
+  final difference = date.difference(now).inDays;
+  return difference.toString();
+}
 
-  }
 
 
   static Future<void> showWarningDailog(BuildContext context,VoidCallback onConfirm) async {
