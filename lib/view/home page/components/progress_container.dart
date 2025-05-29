@@ -24,7 +24,7 @@ class ProgressContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    final tasks = controller.filteredTasks;
+    final tasks = controller.filteredList;
 
     // Безопасность от range error
     if (tasks.isEmpty || index >= tasks.length) return const SizedBox();

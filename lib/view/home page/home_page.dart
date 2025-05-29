@@ -134,7 +134,7 @@ class HomePage extends StatelessWidget {
                               .toList(),
                           onChanged: (val) {
                             controller.selectedFilter.value = val!;
-                            controller.checkData();
+                            controller.applyFilters();
                             controller.update();
                           },
                         )),
@@ -156,7 +156,7 @@ class HomePage extends StatelessWidget {
                               .toList(),
                           onChanged: (val) {
                             controller.selectedCategory.value = val!;
-                            controller.checkData();
+                            controller.applyFilters();
                             controller.update();
                           },
                         )),
@@ -173,7 +173,7 @@ class HomePage extends StatelessWidget {
                               .toList(),
                           onChanged: (val) {
                             controller.selectedPriority.value = val!;
-                            controller.checkData();
+                            controller.applyFilters();
                             controller.update();
                           },
                         )),
@@ -199,7 +199,7 @@ class HomePage extends StatelessWidget {
                               .toList(),
                           onChanged: (val) {
                             controller.selectedSort.value = val!;
-                            controller.checkData();
+                            controller.applyFilters();
                             controller.update();
                           },
                         )),
@@ -230,9 +230,9 @@ class HomePage extends StatelessWidget {
               Obx(() => ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: controller.filteredTasks.length,
+                    itemCount: controller.filteredList.length,
                     itemBuilder: (context, index) {
-                      final task = controller.filteredTasks[index];
+                      final task = controller.filteredList[index];
                       if (task.show == 'yes') {
                         return Column(
                           children: [

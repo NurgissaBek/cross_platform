@@ -34,7 +34,7 @@ class SearchField extends StatelessWidget {
         },
         onChanged: (value) {
           controller.checkText();
-          controller.checkData();
+          controller.applyFilters();
           controller.update();
         },
         style:

@@ -1,120 +1,195 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:to_do_app/Data/network/firebase/firebase_services.dart';
-import 'package:to_do_app/Data/shared%20pref/shared_pref.dart';
-import 'package:to_do_app/utils/utils.dart';
-import 'package:to_do_app/view%20model/DbHelper/db_helper.dart';
-import '../../model/task_model.dart';
 import 'package:intl/intl.dart';
 
+import '../../Data/network/firebase/firebase_services.dart';
+import '../../Data/shared pref/shared_pref.dart';
+import '../../model/task_model.dart';
+import '../../utils/utils.dart';
+import '../DbHelper/db_helper.dart';
+
 class HomeController extends GetxController {
+  // ——— Пользователь ———
   RxMap userData = {}.obs;
   RxString name = ''.obs;
-  RxBool focus = false.obs;
-  RxBool hasText = false.obs;
-  RxInt taskCount = 0.obs;
-  RxBool hasData = false.obs;
 
+  // ——— Поля UI ———
+  RxBool focus = false.obs;
+  RxBool hasData = false.obs;
+  RxInt taskCount = 0.obs;
+
+  // ——— Фильтры ———
   RxString selectedCategory = 'all'.obs;
   RxString selectedPriority = 'all'.obs;
+  RxBool hasText = false.obs;
   RxString selectedSort = 'none'.obs;
-  Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   RxString selectedFilter = 'all'.obs;
+  Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
 
-  final DbHelper db = DbHelper();
+  // ——— Списки ———
   RxList<TaskModel> list = <TaskModel>[].obs;
+  RxList<TaskModel> filteredList = <TaskModel>[].obs;
+
+  // ——— Контроллеры ———
+  final TextEditingController searchController = TextEditingController();
+
+  // ——— БД и сеть ———
+  final DbHelper db = DbHelper();
   Connectivity? connectivity;
-  final TextEditingController searchController = TextEditingController(); // ✅
 
-
-  List<TaskModel> get filteredTasks {
-    List<TaskModel> filtered = list.where((t) => t.show == 'yes').toList();
-
-    final q = searchController.text.trim().toLowerCase();
-      if (q.isNotEmpty) {
-        filtered = filtered.where((t) =>
-          (t.title?.toLowerCase() ?? '').contains(q)
-        ).toList();
-      }
-
-
-    if (selectedFilter.value != 'all') {
-      filtered = filtered.where((t) => t.status == selectedFilter.value).toList();
-    }
-
-    if (selectedCategory.value != 'all') {
-      filtered = filtered.where((t) => t.category == selectedCategory.value).toList();
-    }
-
-    if (selectedPriority.value != 'all') {
-      filtered = filtered.where((t) => t.periority == selectedPriority.value).toList();
-    }
-
-    if (selectedDate.value != null) {
-      final date = DateFormat('dd/MM/yyyy').format(selectedDate.value!);
-      filtered = filtered.where((t) => t.date == date).toList();
-    }
-
-    switch (selectedSort.value) {
-      case 'title_asc':
-        filtered.sort((a, b) => a.title!.compareTo(b.title!));
-        break;
-      case 'title_desc':
-        filtered.sort((a, b) => b.title!.compareTo(a.title!));
-        break;
-      case 'date_asc':
-        filtered.sort((a, b) => a.date!.compareTo(b.date!));
-        break;
-      case 'date_desc':
-        filtered.sort((a, b) => b.date!.compareTo(a.date!));
-        break;
-      case 'priority_high':
-        filtered.sort((a, b) => b.periority!.compareTo(a.periority!));
-        break;
-      case 'priority_low':
-        filtered.sort((a, b) => a.periority!.compareTo(b.periority!));
-        break;
-    }
-
-    return filtered;
-  }
-
+  // ——— Конструктор ———
   HomeController() {
-    _setupSearchListener();
-    _setupRecalculationOnFilterChange();
-
-    if (userData['NAME'] == null) {
-      getUserData();
-    }
-
+    _setupListeners();
+    getUserData();
     _setupFirebaseSync();
     getTaskData();
   }
 
-  void _setupSearchListener() {
-    searchController.addListener(() {
-      checkData();
-    });
-  }
+  void _setupListeners() {
+    searchController.addListener(() => applyFilters());
 
-  void _setupRecalculationOnFilterChange() {
     everAll([
       selectedFilter,
       selectedCategory,
       selectedPriority,
       selectedSort,
       selectedDate,
-    ], (_) {
-      checkData();
-    });
+    ], (_) => applyFilters());
   }
 
+  // ——— Основная фильтрация ———
+  void applyFilters() {
+    List<TaskModel> temp = list.where((t) => t.show == 'yes').toList();
+
+    final q = searchController.text.trim().toLowerCase();
+    if (q.isNotEmpty) {
+      temp = temp.where((t) => t.title!.toLowerCase().contains(q)).toList();
+    }
+
+    if (selectedFilter.value != 'all') {
+      temp = temp.where((t) => t.status == selectedFilter.value).toList();
+    }
+
+    if (selectedCategory.value != 'all') {
+      temp = temp.where((t) => t.category == selectedCategory.value).toList();
+    }
+
+    if (selectedPriority.value != 'all') {
+      temp = temp.where((t) => t.periority == selectedPriority.value).toList();
+    }
+
+    if (selectedDate.value != null) {
+      final date = DateFormat('dd/MM/yyyy').format(selectedDate.value!);
+      temp = temp.where((t) => t.date == date).toList();
+    }
+
+    switch (selectedSort.value) {
+      case 'title_asc':
+        temp.sort((a, b) => a.title!.compareTo(b.title!));
+        break;
+      case 'title_desc':
+        temp.sort((a, b) => b.title!.compareTo(a.title!));
+        break;
+      case 'date_asc':
+        temp.sort((a, b) => a.date!.compareTo(b.date!));
+        break;
+      case 'date_desc':
+        temp.sort((a, b) => b.date!.compareTo(a.date!));
+        break;
+      case 'priority_high':
+        temp.sort((a, b) => b.periority!.compareTo(a.periority!));
+        break;
+      case 'priority_low':
+        temp.sort((a, b) => a.periority!.compareTo(b.periority!));
+        break;
+    }
+
+    filteredList.value = temp;
+    taskCount.value = temp.length;
+    hasData.value = temp.isNotEmpty;
+  }
+
+  // ——— Получение задач из SQLite ———
+  Future<void> getTaskData() async {
+    list.value = await db.getData();
+    final temp = await db.getPendingUploads();
+    list.addAll(temp);
+    applyFilters();
+  }
+
+  // ——— Получение данных пользователя ———
+  Future<void> getUserData() async {
+    userData.value = await UserPref.getUser();
+    getName();
+  }
+
+  void getName() {
+    name.value = userData['NAME']
+        .toString()
+        .split(' ')
+        .first;
+  }
+
+  void checkText() {
+    hasText.value = searchController.text.isNotEmpty;
+    update();
+  }
+
+  void popupMenuSelected(int value, int index, BuildContext context) async {
+    if (value == 2) {
+      Utils.showWarningDailog(context, () => removeFromList(index));
+    }
+  }
+
+
+  // ——— Очистка поиска ———
+  void onClear(BuildContext context) {
+    searchController.clear();
+    FocusScope.of(context).unfocus();
+    applyFilters();
+  }
+
+  void onTapField() {
+    focus.value = true;
+  }
+
+  void onTapOutside(BuildContext context) {
+    focus.value = false;
+    FocusScope.of(context).unfocus();
+  }
+
+  // ——— Удаление задачи ———
+  void removeFromList(int index) {
+    final task = filteredList[index];
+    db.removeFromList(task.copyWith(show: 'no')).then((_) => getTaskData());
+  }
+
+  // ——— Обновление задачи ———
+  Future<void> updateTask(int index, TaskModel updatedTask) async {
+    list[index] = updatedTask;
+    await db.update(updatedTask);
+
+    final connection = await connectivity?.checkConnectivity();
+    if (connection == ConnectivityResult.mobile ||
+        connection == ConnectivityResult.wifi) {
+      await FirebaseService.update(updatedTask.key!, 'title', updatedTask.title!);
+      await FirebaseService.update(updatedTask.key!, 'description', updatedTask.description!);
+      await FirebaseService.update(updatedTask.key!, 'category', updatedTask.category!);
+    } else {
+      await db.insert(updatedTask);
+    }
+
+    applyFilters();
+  }
+
+  // ——— Синхронизация с Firebase ———
   void _setupFirebaseSync() {
-    String? email = FirebaseService.auth.currentUser?.email;
+    final email = FirebaseService.auth.currentUser?.email;
     if (email == null) return;
-    String node = email.substring(0, email.indexOf('@'));
+
+    final node = email.substring(0, email.indexOf('@'));
 
     FirebaseDatabase.instance.ref('Tasks').child(node).onValue.listen((event) async {
       getTaskData();
@@ -158,103 +233,21 @@ class HomeController extends GetxController {
     connectivity = Connectivity();
     connectivity!.onConnectivityChanged.listen((event) async {
       if (event == ConnectivityResult.mobile || event == ConnectivityResult.wifi) {
-        var list = await db.getPendingUploads();
-        for (var task in list) {
+        var uploadList = await db.getPendingUploads();
+        for (var task in uploadList) {
           db.insert(task);
           db.delete(task.key!, 'PendingUploads');
         }
-        list.clear();
-        list = await db.getPendingDeletes();
-        for (var task in list) {
+        uploadList.clear();
+
+        var deleteList = await db.getPendingDeletes();
+        for (var task in deleteList) {
           FirebaseService.update(task.key!, 'show', 'no');
           db.delete(task.key!, 'PendingDeletes');
         }
+
         getTaskData();
       }
     });
-  }
-
-  void checkData() {
-    final count = filteredTasks.length;
-    taskCount.value = count;
-    hasData.value = count > 0;
-  }
-
-  void popupMenuSelected(int value, int index, BuildContext context) async {
-    if (value == 2) {
-      Utils.showWarningDailog(context, () => removeFromList(index));
-    }
-  }
-
-  Future<void> getTaskData() async {
-    list.value = await db.getData();
-    final temp = await db.getPendingUploads();
-    list.addAll(temp);
-    checkData();
-  }
-
-  Future<List<TaskModel>> getFututeData() => db.getData();
-
-  void onClear(BuildContext context) {
-    searchController.text = '';
-    hasText.value = false;
-    onTapOutside(context);
-    checkData();
-  }
-
-  void onTapOutside(BuildContext context) {
-    focus.value = false;
-    FocusScope.of(context).unfocus();
-  }
-
-  void checkText() {
-    hasText.value = searchController.text.isNotEmpty;
-    update();
-  }
-
-  void onTapField() {
-    focus.value = true;
-  }
-
-  Future<void> getUserData() async {
-    userData.value = await UserPref.getUser();
-    getName();
-  }
-
-  void getName() {
-    name.value = userData['NAME']
-        .toString()
-        .substring(0, userData['NAME'].toString().indexOf(' '));
-  }
-
-  void removeFromList(int index) {
-    db.removeFromList(TaskModel(
-      key: list[index].key,
-      status: list[index].status,
-      time: list[index].time,
-      date: list[index].date,
-      periority: list[index].periority,
-      description: list[index].description,
-      category: list[index].category,
-      title: list[index].title,
-      image: list[index].image,
-      show: 'no',
-    )).then((_) => getTaskData());
-  }
-
-  Future<void> updateTask(int index, TaskModel updatedTask) async {
-    list[index] = updatedTask;
-    update();
-
-    await db.update(updatedTask);
-
-    final connection = await connectivity?.checkConnectivity();
-    if (connection == ConnectivityResult.mobile || connection == ConnectivityResult.wifi) {
-      await FirebaseService.update(updatedTask.key!, 'title', updatedTask.title!);
-      await FirebaseService.update(updatedTask.key!, 'description', updatedTask.description!);
-      await FirebaseService.update(updatedTask.key!, 'category', updatedTask.category!);
-    } else {
-      await db.insert(updatedTask);
-    }
   }
 }

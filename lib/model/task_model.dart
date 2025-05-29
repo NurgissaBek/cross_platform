@@ -24,6 +24,32 @@ class TaskModel {
       required this.show,
       required this.status});
 
+  TaskModel copyWith({
+    String? key,
+    String? title,
+    String? category,
+    String? description,
+    String? image,
+    String? periority,
+    String? time,
+    String? date,
+    String? show,
+    String? status,
+  }) {
+    return TaskModel(
+      key: key ?? this.key,
+      title: title ?? this.title,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      image: image ?? this.image,
+      periority: periority ?? this.periority,
+      time: time ?? this.time,
+      date: date ?? this.date,
+      show: show ?? this.show,
+      status: status ?? this.status,
+    );
+  }
+
   TaskModel.fromMap(Map<String, dynamic> res) {
     key = res['key'];
     title = res['title'];

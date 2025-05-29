@@ -16,9 +16,9 @@ class ProgressTask extends StatelessWidget {
         child: Obx(
           () => ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: controller.filteredTasks.length,
+            itemCount: controller.filteredList.length,
             itemBuilder: (context, index) {
-              if (controller.filteredTasks[index].show == 'yes') {
+              if (controller.filteredList[index].show == 'yes') {
                 return GestureDetector(
                   onTap: () {
                     // controller.removeFromList(index);
