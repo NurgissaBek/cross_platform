@@ -7,6 +7,7 @@ import '../../../res/app_color.dart';
 import '../../../utils/utils.dart';
 import '../../../view model/controller/home_controller.dart';
 import '../../common widgets/back_button.dart';
+import '../../edit task/edit_task.dart';
 
 class ProgressContainer extends StatelessWidget {
   final int index;
@@ -65,7 +66,11 @@ class ProgressContainer extends StatelessWidget {
                         color: primaryColor,
                         position: PopupMenuPosition.under,
                         onSelected: (value) {
-                          controller.popupMenuSelected(value, index, context);
+                          if(value==1){
+                            Get.to(()=>EditTaskPage(task: controller.list[index], index: index));
+                          } else if(value == 2){
+                            controller.popupMenuSelected(value, index, context);
+                          }
                         },
                         icon: const Icon(
                           Icons.more_vert_rounded,

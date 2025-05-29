@@ -26,8 +26,10 @@ class HomeController extends GetxController {
     }
     // check for set listeners only for one time
     if (connectivity == null) {
-      String str = FirebaseService.auth.currentUser!.email.toString();
-      String node = str.substring(0, str.indexOf('@'));
+      String? email = FirebaseService.auth.currentUser?.email;
+      if (email == null) return;
+      String node = email.substring(0, email.indexOf('@'));
+
       // listener for changing live database
       FirebaseDatabase.instance
           .ref('Tasks')
@@ -186,4 +188,28 @@ class HomeController extends GetxController {
       getTaskData();
     });
   }
+  Future<void> updateTask(int index, TaskModel updatedTask) async {
+  // 1) сразу меняем локальный список, чтобы UI обновился мгновенно
+  list[index] = updatedTask;
+  update();
+
+  // 2) кидаем апдейт в SQLite
+  await db.update(updatedTask);
+
+  // 3) если есть сеть — продублируем в Firebase
+  final connection = await connectivity?.checkConnectivity();
+  if (connection == ConnectivityResult.mobile ||
+      connection == ConnectivityResult.wifi) {
+    // FirebaseServices.update обновляет одно поле за раз,
+    // поэтому прогоним по нужным ключам:
+    await FirebaseService.update(updatedTask.key!, 'title',       updatedTask.title!);
+    await FirebaseService.update(updatedTask.key!, 'description', updatedTask.description!);
+    await FirebaseService.update(updatedTask.key!, 'category',    updatedTask.category!);
+    await FirebaseService.update(updatedTask.key!, 'progress',    updatedTask.progress!);
+  } else {
+    // офлайн-режим — кладём в PendingUploads, если он у тебя используется
+    await db.insert(updatedTask);
+  }
+}
+
 }

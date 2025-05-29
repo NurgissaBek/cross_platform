@@ -74,15 +74,14 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const CustomBackButton(
-                      height: 40,
-                      width: 40,
-                      radius: 40,
-                      widget: Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: FlutterLogo(),
-                        ),
+                    InkWell(
+                      onTap: (){
+                        Get.toNamed('/profile');
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, color: Colors.black),
                       ),
                     )
                   ],
