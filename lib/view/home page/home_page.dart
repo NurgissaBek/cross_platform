@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
         backgroundColor: black,
         floatingActionButton: GestureDetector(
-          onTap: () => NewTask(MediaQuery.sizeOf(context)),
+          onTap: () => showNewTaskModal(context),
           child: Container(
             height: 65,
             width: 65,

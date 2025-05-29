@@ -15,6 +15,7 @@ class HomeController extends GetxController {
   RxBool hasText = false.obs;
   RxInt taskCount = 0.obs;
   RxBool hasData = false.obs;
+  
   final DbHelper db = DbHelper();
   RxList list = [].obs;
   Connectivity? connectivity;
@@ -48,7 +49,6 @@ class HomeController extends GetxController {
               TaskModel(
                   key: element.child('key').value.toString(),
                   time: element.child('time').value.toString(),
-                  progress: element.child('progress').value.toString(),
                   status: element.child('status').value.toString(),
                   date: element.child('date').value.toString(),
                   periority: element.child('periority').value.toString(),
@@ -77,7 +77,6 @@ class HomeController extends GetxController {
         for (var element in event.snapshot.children) {
           db
               .update(TaskModel(
-              progress: element.child('progress').value.toString(),
               status: element.child('status').value.toString(),
                   key: element.child('key').value.toString(),
                   time: element.child('time').value.toString(),
@@ -175,7 +174,6 @@ class HomeController extends GetxController {
         .removeFromList(TaskModel(
             key: list[index].key,
             status: list[index].status,
-            progress: list[index].progress,
             time: list[index].time,
             date: list[index].date,
             periority: list[index].periority,
@@ -205,7 +203,6 @@ class HomeController extends GetxController {
     await FirebaseService.update(updatedTask.key!, 'title',       updatedTask.title!);
     await FirebaseService.update(updatedTask.key!, 'description', updatedTask.description!);
     await FirebaseService.update(updatedTask.key!, 'category',    updatedTask.category!);
-    await FirebaseService.update(updatedTask.key!, 'progress',    updatedTask.progress!);
   } else {
     // офлайн-режим — кладём в PendingUploads, если он у тебя используется
     await db.insert(updatedTask);

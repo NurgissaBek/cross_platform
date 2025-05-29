@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:to_do_app/data/category_repository.dart';
 import 'package:to_do_app/res/routes/app_routes.dart';
 import 'firebase_options.dart';
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
+  Get.put(CategoryRepository());
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

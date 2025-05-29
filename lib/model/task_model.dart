@@ -10,7 +10,6 @@ class TaskModel {
   String? time;
   String? date;
   String? show;
-  String? progress;
   String? status;
 
   TaskModel(
@@ -23,7 +22,6 @@ class TaskModel {
       required this.title,
       required this.image,
       required this.show,
-      required this.progress,
       required this.status});
 
   TaskModel.fromMap(Map<String, dynamic> res) {
@@ -36,7 +34,6 @@ class TaskModel {
     show = res['show'];
     time = res['time'];
     date = res['date'];
-    progress=res['progress'];
     status=res['status'];
   }
 
@@ -52,7 +49,6 @@ class TaskModel {
       'date': date,
       'show': show,
       'status' : status,
-      'progress' : progress,
     };
   }
 }

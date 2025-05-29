@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:to_do_app/res/app_color.dart';
-import 'package:to_do_app/view/new%20task/components/addtask_body.dart';
+import 'package:to_do_app/view/new task/components/addtask_body.dart';
 
-class NewTask {
-  NewTask(Size size) {
-    Get.bottomSheet(
+void showNewTaskModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: black,
-        isScrollControlled: true,
-          TaskBody());
-
-  }
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('Создать задачу'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
+        body: TaskBody(),
+      );
+    },
+  );
 }

@@ -6,7 +6,6 @@ import 'package:to_do_app/model/task_model.dart';
 import 'package:to_do_app/utils/utils.dart';
 import 'package:to_do_app/view%20model/DbHelper/db_helper.dart';
 import 'package:to_do_app/view%20model/controller/home_controller.dart';
-import 'package:to_do_app/view/new%20task/components/progress_picker.dart';
 
 class AddTaskController extends GetxController{
   final DbHelper database=DbHelper();
@@ -30,7 +29,6 @@ class AddTaskController extends GetxController{
     try{
       loading.value=true;
      await database.insert(TaskModel(
-       progress: progress.value.toInt().toString(),
           status: 'unComplete',
           key: DateTime.now().microsecondsSinceEpoch.toString(),
           time: time.value,
@@ -61,25 +59,6 @@ class AddTaskController extends GetxController{
        loading.value=false;
       Utils.showSnackBar('Warning', e.toString(), const Icon(FontAwesomeIcons.triangleExclamation,color: Colors.pinkAccent,));
     }
-  }
-  showProgressPicker(BuildContext context){
-    if(title.value.text.toString().isEmpty){
-      Utils.showSnackBar('Warning', 'Add title of your task', const Icon(FontAwesomeIcons.triangleExclamation,color: Colors.pinkAccent,));
-      return;
-    }
-    if(category.value.text.toString().isEmpty){
-      Utils.showSnackBar('Warning', 'Add category of your task', const Icon(FontAwesomeIcons.triangleExclamation,color: Colors.pinkAccent,));
-      return;
-    }
-    if(date.value.isEmpty){
-      Utils.showSnackBar('Warning', 'Add date for your task', const Icon(FontAwesomeIcons.triangleExclamation,color: Colors.pinkAccent,));
-      return;
-    }
-    if(int.parse(Utils.getDaysDiffirece(date.value))<0){
-      Utils.showSnackBar('Warning', 'Please select correct date', const Icon(FontAwesomeIcons.triangleExclamation,color: Colors.pinkAccent,));
-      return;
-    }
-    ProgressPicker(context);
   }
   pickDate(BuildContext context)async{
     var pickedDate=await showDatePicker(

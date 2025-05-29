@@ -137,37 +137,6 @@ class ProgressContainer extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Progress',
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
-                    ),
-                    Text(
-                      '60%',
-                      style: const TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 6,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child:  LinearProgressIndicator(
-                    value: 0.6,
-                    // double.parse(controller.list[index].progress)/100.0
-                    backgroundColor: Colors.deepPurple,
-                    color: Colors.white,
-                  ),
-                ),
                 const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
