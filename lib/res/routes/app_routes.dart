@@ -5,6 +5,7 @@ import 'package:to_do_app/view/sign%20in/sign_in.dart';
 import 'package:to_do_app/view/sign%20up/sign_up.dart';
 import 'package:to_do_app/view/splash/splash_screen.dart';
 import 'package:to_do_app/view/profile/profile_page.dart';
+import 'package:to_do_app/view/settings/settings_page.dart';
 
 
 class AppRoutes{
@@ -15,6 +16,7 @@ class AppRoutes{
       GetPage(name: Routes.signInScreen, page: ()=>const SignIn()),
       GetPage(name: Routes.homePage, page: ()=> HomePage()),
       GetPage(name: Routes.profile, page: () => const ProfilePage()),
+      GetPage(name: Routes.settings, page: () => const SettingsPage()),
     ];
   }
 }

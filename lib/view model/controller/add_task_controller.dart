@@ -1,8 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do_app/model/task_model.dart';
+import 'package:to_do_app/services/notification_service.dart';
 import 'package:to_do_app/utils/utils.dart';
 import 'package:to_do_app/view%20model/DbHelper/db_helper.dart';
 import 'package:to_do_app/view%20model/controller/home_controller.dart';
@@ -49,6 +51,16 @@ class AddTaskController extends GetxController{
        selectedImageIndex.value=1;
             await Future.delayed(const Duration(milliseconds: 700));
        loading.value=false;
+       await NotificationService.display(
+        RemoteMessage(
+          notification: RemoteNotification(
+            title: 'Новая задача',
+            body: 'Задача "${title.value.text}" добавлена',
+          ),
+          data: {'payload': 'task_created'},
+        ),
+      );
+
 
             Get.back();
      }).onError((error, stackTrace){

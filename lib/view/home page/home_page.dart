@@ -50,8 +50,10 @@ class HomePage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SvgPicture.asset(AppIcon.menu,
-                        color: Colors.white, height: 30, width: 30),
+                    InkWell(
+                      onTap: () => Get.toNamed('/settings'),
+                      child: Icon(Icons.settings, color: Theme.of(context).textTheme.bodyLarge?.color, size: 28),
+                    ),
                     Column(
                       children: [
                         Obx(
